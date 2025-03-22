@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Music Player Online by Danishtzy24</title>
+  <title>Music Player By Danishtzy24</title>
   <!-- Google Fonts: Poppins -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <!-- Font Awesome -->
@@ -19,15 +19,14 @@
     .container {
       width: 100%; height: 100%; display: flex; position: relative;
     }
+    /* SIDEBAR PLAYLIST */
     .sidebar {
       width: 300px; background: #181818; padding: 20px; border-right: 1px solid #333;
       overflow-y: auto; max-height: 100%; transition: width 0.3s ease, padding 0.3s ease;
     }
     .sidebar.collapsed { width: 0; padding: 0; border: none; overflow: hidden; }
     .sidebar::-webkit-scrollbar { display: none; }
-    .sidebar h2 {
-      font-size: 20px; margin-bottom: 15px; color: #fff;
-    }
+    .sidebar h2 { font-size: 20px; margin-bottom: 15px; color: #fff; }
     #tambahMusikBtn {
       display: block; width: 100%; padding: 10px; margin-bottom: 15px;
       background: #1db954; color: #fff; border: none; font-size: 16px; cursor: pointer;
@@ -60,9 +59,7 @@
     .playlist-item .track-text {
       font-size: 14px; font-weight: 500; color: #fff; flex: 1;
     }
-    .drag-handle {
-      color: #fff; font-size: 18px; cursor: move; margin-right: 5px;
-    }
+    .drag-handle { color: #fff; font-size: 18px; cursor: move; margin-right: 5px; }
     #toggleSidebar {
       position: absolute; top: 50%; left: 280px; transform: translateY(-50%);
       background: #1db954; border: none; color: #fff; font-size: 20px; cursor: pointer;
@@ -105,9 +102,7 @@
     .cover-container img {
       width: 100%; height: 100%; object-fit: cover; transition: transform 0.1s ease-out;
     }
-    .track-info {
-      text-align: center; margin-bottom: 20px;
-    }
+    .track-info { text-align: center; margin-bottom: 20px; }
     .track-info h2 {
       font-size: 28px; color: #1db954; margin-bottom: 10px;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
@@ -232,9 +227,7 @@
       border-radius: 8px; width: 90%; max-width: 400px;
       box-shadow: 0 8px 30px rgba(0,0,0,0.8); text-align: center;
     }
-    .confirm-modal-content p {
-      margin: 0 0 20px; font-size: 18px;
-    }
+    .confirm-modal-content p { margin: 0 0 20px; font-size: 18px; }
     .confirm-modal-content button {
       padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px;
       cursor: pointer; font-size: 16px; transition: background 0.3s ease;
@@ -255,7 +248,7 @@
   </style>
 </head>
 <body>
-  <!-- Blok klik kanan & devtools -->
+  <!-- Blok Klik Kanan & DevTools Shortcut -->
   <script>
     document.addEventListener('contextmenu', event => event.preventDefault());
     document.addEventListener('keydown', function(e) {
@@ -275,13 +268,12 @@
   <button id="toggleSidebar"><i class="fas fa-angle-double-left"></i></button>
 
   <div class="container">
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR PLAYLIST -->
     <div class="sidebar" id="sidebar">
       <h2>Playlist</h2>
       <button id="tambahMusikBtn">Tambah Musik</button>
       <div id="playlist"></div>
     </div>
-
     <!-- MAIN CONTENT -->
     <div class="main-content">
       <video id="bgVideo" autoplay muted loop></video>
@@ -291,7 +283,7 @@
       </div>
       <div class="player">
         <div class="cover-container" id="coverContainer">
-          <!-- Cover kosong (user baru) -->
+          <!-- Tidak ada default cover -->
           <img id="cover" src="" alt="Cover"/>
         </div>
         <div class="track-info">
@@ -315,7 +307,7 @@
           <button id="muteBtn"><i class="fas fa-volume-up"></i></button>
           <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1"/>
         </div>
-        <!-- dB meter -->
+        <!-- dB Meter -->
         <div class="db-meter-container">
           <div class="db-meter-fill" id="dbMeterFill"></div>
           <div class="db-meter-peak" id="dbMeterPeak"></div>
@@ -328,7 +320,7 @@
           </div>
         </div>
         <div class="db-meter-label" id="dbMeterLabel">-∞ dB</div>
-        <!-- Audio kosong (user baru) -->
+        <!-- Audio kosong untuk user baru -->
         <audio id="audio" src=""></audio>
       </div>
     </div>
@@ -341,22 +333,16 @@
       <form id="musicForm">
         <label for="trackTitleInput">Judul</label>
         <input type="text" id="trackTitleInput" required>
-
         <label for="trackArtistInput">Artis</label>
         <input type="text" id="trackArtistInput" required>
-
         <label for="trackGenreInput">Genre</label>
         <input type="text" id="trackGenreInput" placeholder="misal: Pluggnb / Kawaii" required>
-
         <label for="trackFileInput">File Musik (MP3)</label>
         <input type="file" id="trackFileInput" accept="audio/*" required>
-
         <label for="coverFileInput">Cover (Gambar)</label>
         <input type="file" id="coverFileInput" accept="image/*" required>
-
         <label for="bgFileInput">Background (Video/Gambar) (Opsional)</label>
         <input type="file" id="bgFileInput" accept="video/*, image/*">
-
         <label for="bgTypeSelect">Tipe Background</label>
         <select id="bgTypeSelect">
           <option value="video">Video</option>
@@ -379,7 +365,7 @@
   </div>
 
   <script>
-    /* Variabel & Elemen DOM */
+    /* Variabel & Elemen DOM Utama */
     const audio = document.getElementById("audio"),
           bgVideo = document.getElementById("bgVideo"),
           playPauseBtn = document.getElementById("playPauseBtn"),
@@ -422,7 +408,7 @@
         currentTrackIndex = 0, audioCtx, analyserL, analyserR, dataArrayL, dataArrayR,
         peakDb = -60, PEAK_DECAY = 0.3;
 
-    // Array track kosong => user baru tidak ada default
+    // Array tracks kosong (user baru tidak ada default)
     let tracks = [];
 
     /* Load & Save localStorage */
@@ -438,7 +424,7 @@
       localStorage.setItem("currentTime", audio.currentTime);
     }
 
-    /* Media Session API - notifikasi background */
+    /* Media Session API */
     function updateMediaSessionMetadata(track) {
       if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
@@ -452,7 +438,7 @@
       }
     }
 
-    /* Setup Analyser (AudioContext) */
+    /* Setup AudioContext & Analyser */
     function setupAnalyser() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -469,6 +455,7 @@
         dataArrayR = new Uint8Array(analyserR.frequencyBinCount);
       }
     }
+
     /* dB Meter */
     function updateDbMeter() {
       if (audioCtx && audioCtx.state !== 'suspended') {
@@ -517,15 +504,13 @@
       trackArtistEl.textContent = track.artist;
       coverEl.src = track.cover;
       updateMediaSessionMetadata(track);
-
       if (track.bgType === "video" && track.video) {
         bgVideo.style.display = "block";
         bgVideo.src = track.video;
         bgVideo.load();
-        // Sinkron play/pause
         if (isPlaying) bgVideo.play();
         document.querySelector(".main-content").style.backgroundImage = "";
-      } else if (track.video) {
+      } else if (track.bgType === "image" && track.video) {
         bgVideo.pause();
         bgVideo.style.display = "none";
         document.querySelector(".main-content").style.backgroundImage = `url(${track.video})`;
@@ -539,7 +524,7 @@
       setGradientBackground(track.cover);
     }
 
-    /* Set BG Body dari cover */
+    /* Set Gradient Background berdasarkan cover */
     function setGradientBackground(coverSrc) {
       if (!coverSrc) return;
       const img = new Image();
@@ -563,7 +548,7 @@
       };
     }
 
-    /* Update item playlist aktif */
+    /* Update Playlist Item Aktif */
     function updateActivePlaylist() {
       const allItems = playlistEl.querySelectorAll("li");
       allItems.forEach(item => {
@@ -572,7 +557,7 @@
       });
     }
 
-    /* Populate Playlist (Drag & Drop) */
+    /* Populate Playlist (Grouping + Drag & Drop) */
     function populatePlaylist() {
       const genreGroups = {};
       tracks.forEach((track, index) => {
@@ -626,9 +611,7 @@
               genre, oldPos: pos, trackIndex: index
             }));
           });
-          li.addEventListener("dragend", () => {
-            li.classList.remove("dragging");
-          });
+          li.addEventListener("dragend", () => { li.classList.remove("dragging"); });
           li.addEventListener("dragover", (e) => { e.preventDefault(); });
           li.addEventListener("drop", (e) => {
             e.preventDefault();
@@ -670,7 +653,7 @@
       updateActivePlaylist();
     }
 
-    /* Toggle Play/Pause => sinkron dengan video */
+    /* Toggle Play/Pause dengan sinkronisasi video */
     function togglePlayPause() {
       if (!isPlaying) {
         audio.play();
@@ -679,19 +662,13 @@
         coverContainer.classList.add("playing");
         if (!audioCtx) { setupAnalyser(); requestAnimationFrame(updateDbMeter); }
         else if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-        // Jika background video ditampilkan, ikut play
-        if (bgVideo.style.display !== "none") {
-          bgVideo.play();
-        }
+        if (bgVideo.style.display !== "none") { bgVideo.play(); }
       } else {
         audio.pause();
         isPlaying = false;
         playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
         coverContainer.classList.remove("playing");
-        // Pause video
-        if (bgVideo.style.display !== "none") {
-          bgVideo.pause();
-        }
+        if (bgVideo.style.display !== "none") { bgVideo.pause(); }
       }
     }
     function playNext() {
@@ -703,9 +680,7 @@
       isPlaying = true;
       playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
       coverContainer.classList.add("playing");
-      if (bgVideo.style.display !== "none") {
-        bgVideo.play();
-      }
+      if (bgVideo.style.display !== "none") { bgVideo.play(); }
     }
     function playPrev() {
       if (tracks.length === 0) return;
@@ -716,11 +691,8 @@
       isPlaying = true;
       playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
       coverContainer.classList.add("playing");
-      if (bgVideo.style.display !== "none") {
-        bgVideo.play();
-      }
+      if (bgVideo.style.display !== "none") { bgVideo.play(); }
     }
-
     repeatBtn.addEventListener("click", () => {
       isRepeat = !isRepeat;
       repeatBtn.classList.toggle("repeat-active", isRepeat);
@@ -733,9 +705,7 @@
       }
     });
     audio.addEventListener("loadedmetadata", () => {
-      if (audio.duration) {
-        totalTimeEl.textContent = formatTime(audio.duration);
-      }
+      if (audio.duration) totalTimeEl.textContent = formatTime(audio.duration);
     });
     audio.addEventListener("ended", () => {
       if (isRepeat) {
@@ -796,7 +766,6 @@
       localStorage.setItem("currentTime", audio.currentTime);
     }
     window.addEventListener("beforeunload", saveState);
-
     function loadState() {
       const savedIndex = localStorage.getItem("currentTrackIndex"),
             savedTime = localStorage.getItem("currentTime");
@@ -808,10 +777,7 @@
       loadTracksFromStorage();
       populatePlaylist();
       loadState();
-      // Jika ada track, load track
-      if (tracks.length > 0) {
-        loadTrack(currentTrackIndex);
-      }
+      if (tracks.length > 0) { loadTrack(currentTrackIndex); }
       setupAnalyser();
       updateDbMeter();
     }
@@ -819,7 +785,6 @@
     prevBtn.addEventListener("click", playPrev);
     nextBtn.addEventListener("click", playNext);
     muteBtn.addEventListener("click", toggleMute);
-
     window.addEventListener("load", init);
 
     /* Toggle Sidebar */
