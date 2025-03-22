@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Music Player By Danishtzy24</title>
+  <title>Music Player Online By Danishtzy24</title>
   <!-- Google Fonts: Poppins -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <!-- Font Awesome -->
@@ -11,226 +11,539 @@
   <style>
     /* RESET & DASAR */
     html, body {
-      margin: 0; padding: 0; width: 100%; height: 100%;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #1e1e1e, #121212);
-      overflow: hidden; color: #fff;
+      overflow: hidden;
+      color: #fff;
     }
+    /* Loading Overlay */
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      z-index: 7000;
+      align-items: center;
+      justify-content: center;
+    }
+    #loadingOverlay .spinner {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #1db954;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    /* CONTAINER UTAMA */
     .container {
-      width: 100%; height: 100%; display: flex; position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      position: relative;
     }
     /* SIDEBAR PLAYLIST */
     .sidebar {
-      width: 300px; background: #181818; padding: 20px; border-right: 1px solid #333;
-      overflow-y: auto; max-height: 100%; transition: width 0.3s ease, padding 0.3s ease;
+      width: 300px;
+      background: #181818;
+      padding: 20px;
+      border-right: 1px solid #333;
+      overflow-y: auto;
+      max-height: 100%;
+      transition: width 0.3s ease, padding 0.3s ease;
+      position: relative;
     }
-    .sidebar.collapsed { width: 0; padding: 0; border: none; overflow: hidden; }
-    .sidebar::-webkit-scrollbar { display: none; }
-    .sidebar h2 { font-size: 20px; margin-bottom: 15px; color: #fff; }
+    .sidebar.collapsed {
+      width: 0;
+      padding: 0;
+      border: none;
+      overflow: hidden;
+    }
+    .sidebar::-webkit-scrollbar {
+      display: none;
+    }
+    .sidebar h2 {
+      font-size: 20px;
+      margin-bottom: 15px;
+      color: #fff;
+      display: inline-block;
+    }
+    /* Tombol Hapus Data Mobile (hanya muncul di mobile) */
+    #mobileDeleteBtn {
+      display: none;
+      background: #ff4d4d;
+      border: none;
+      color: #fff;
+      font-size: 14px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+    @media (max-width: 768px) {
+      #mobileDeleteBtn {
+        display: inline-block;
+      }
+    }
     #tambahMusikBtn {
-      display: block; width: 100%; padding: 10px; margin-bottom: 15px;
-      background: #1db954; color: #fff; border: none; font-size: 16px; cursor: pointer;
-      border-radius: 4px; transition: background 0.3s ease;
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      background: #1db954;
+      color: #fff;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.3s ease;
     }
-    #tambahMusikBtn:hover { background: #17a44c; }
-    .genre-section { margin-bottom: 15px; }
+    #tambahMusikBtn:hover {
+      background: #17a44c;
+    }
+    .genre-section {
+      margin-bottom: 15px;
+    }
     .genre-header {
-      display: flex; justify-content: space-between; align-items: center;
-      cursor: pointer; margin-bottom: 5px; border-bottom: 1px solid #333;
-      padding: 5px 0; font-size: 16px; color: #fff; font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      margin-bottom: 5px;
+      border-bottom: 1px solid #333;
+      padding: 5px 0;
+      font-size: 16px;
+      color: #fff;
+      font-weight: 600;
     }
-    .genre-header i { transition: transform 0.3s; color: #fff; }
+    .genre-header i {
+      transition: transform 0.3s;
+      color: #fff;
+    }
     .genre-section ul {
-      list-style: none; margin: 0; padding: 0; max-height: 0; overflow: hidden;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 0;
+      overflow: hidden;
       transition: max-height 0.3s ease;
     }
     .playlist-item {
-      display: flex; align-items: center; gap: 10px;
-      background: #808080; margin-bottom: 8px; padding: 8px 10px;
-      border-radius: 8px; cursor: pointer; transition: background 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #808080;
+      margin-bottom: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
       position: relative;
     }
-    .playlist-item:hover { background: #a9a9a9; }
-    .playlist-item.active { background: #1db954; outline: none; }
-    .playlist-item.dragging { outline: none !important; }
+    .playlist-item:hover {
+      background: #a9a9a9;
+    }
+    .playlist-item.active {
+      background: #1db954;
+      outline: none;
+    }
+    .playlist-item.dragging {
+      outline: none !important;
+    }
     .playlist-item img.track-preview {
-      width: 50px; height: 50px; object-fit: cover; border-radius: 4px; flex-shrink: 0;
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 4px;
+      flex-shrink: 0;
     }
     .playlist-item .track-text {
-      font-size: 14px; font-weight: 500; color: #fff; flex: 1;
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+      flex: 1;
     }
-    .drag-handle { color: #fff; font-size: 18px; cursor: move; margin-right: 5px; }
+    .drag-handle {
+      color: #fff;
+      font-size: 18px;
+      cursor: move;
+      margin-right: 5px;
+    }
     #toggleSidebar {
-      position: absolute; top: 50%; left: 280px; transform: translateY(-50%);
-      background: #1db954; border: none; color: #fff; font-size: 20px; cursor: pointer;
-      z-index: 10; width: 40px; height: 40px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
+      position: absolute;
+      top: 50%;
+      left: 280px;
+      transform: translateY(-50%);
+      background: #1db954;
+      border: none;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 10;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: left 0.3s ease, background 0.3s ease;
     }
-    #toggleSidebar:hover { background: #17a44c; }
-    .main-content {
-      flex: 1; padding: 20px; overflow-y: auto; position: relative;
+    #toggleSidebar:hover {
+      background: #17a44c;
     }
-    .main-content::-webkit-scrollbar { display: none; }
+    .main-content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      position: relative;
+    }
+    .main-content::-webkit-scrollbar {
+      display: none;
+    }
     #bgVideo {
-      position: absolute; top: 0; left: 0; width: 100%; height: 140%;
-      object-fit: cover; z-index: 0;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 140%;
+      object-fit: cover;
+      z-index: 0;
     }
     .overlay {
-      position: absolute; top: 0; left: 0; width: 100%; height: 140%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 140%;
       background: radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
-      z-index: 1; opacity: 1; transition: opacity 0.5s ease;
+      z-index: 1;
+      opacity: 1;
+      transition: opacity 0.5s ease;
     }
-    .main-content:hover .overlay { opacity: 0; }
-    .navbar, .player { position: relative; z-index: 2; }
+    .main-content:hover .overlay {
+      opacity: 0;
+    }
+    .navbar, .player {
+      position: relative;
+      z-index: 2;
+    }
     .navbar {
-      display: flex; justify-content: space-between; align-items: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 20px;
     }
     .navbar .title {
-      font-size: 24px; color: #1db954;
+      font-size: 24px;
+      color: #1db954;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
     }
     .player {
-      display: flex; flex-direction: column; align-items: center;
-      flex: 1; justify-content: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      justify-content: center;
     }
     .cover-container {
-      width: 300px; height: 300px; overflow: hidden; border-radius: 10px;
-      margin-bottom: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.6); position: relative;
+      width: 300px;
+      height: 300px;
+      overflow: hidden;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+      position: relative;
     }
     .cover-container img {
-      width: 100%; height: 100%; object-fit: cover; transition: transform 0.1s ease-out;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.1s ease-out;
     }
-    .track-info { text-align: center; margin-bottom: 20px; }
+    .track-info {
+      text-align: center;
+      margin-bottom: 20px;
+    }
     .track-info h2 {
-      font-size: 28px; color: #1db954; margin-bottom: 10px;
+      font-size: 28px;
+      color: #1db954;
+      margin-bottom: 10px;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
     }
     .track-info p {
-      font-size: 18px; color: #b3b3b3;
+      font-size: 18px;
+      color: #b3b3b3;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
     }
     .controls {
-      display: flex; align-items: center; gap: 20px; margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
     }
     .controls button {
-      background: none; border: none; color: #fff; font-size: 26px; cursor: pointer;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 26px;
+      cursor: pointer;
       transition: transform 0.2s ease, color 0.2s ease;
     }
-    .controls button:hover { transform: scale(1.2); color: #1db954; }
-    .controls button.repeat-active { color: #1db954; }
+    .controls button:hover {
+      transform: scale(1.2);
+      color: #1db954;
+    }
+    .controls button.repeat-active {
+      color: #1db954;
+    }
     .progress-container {
-      width: 80%; background: #404040; border-radius: 5px; height: 8px;
-      cursor: pointer; margin-bottom: 10px; overflow: hidden;
+      width: 80%;
+      background: #404040;
+      border-radius: 5px;
+      height: 8px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      overflow: hidden;
     }
     .progress-bar {
-      width: 0%; height: 100%; background: #1db954; border-radius: 5px;
+      width: 0%;
+      height: 100%;
+      background: #1db954;
+      border-radius: 5px;
       transition: width 0.1s ease;
     }
     .time-info {
-      display: flex; justify-content: space-between; width: 80%;
-      font-size: 14px; color: #b3b3b3; margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      width: 80%;
+      font-size: 14px;
+      color: #b3b3b3;
+      margin-bottom: 20px;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     }
     .volume-container {
-      display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
     }
     .volume-container button {
-      background: none; border: none; color: #fff; font-size: 24px; cursor: pointer;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
       transition: transform 0.2s ease, color 0.2s ease;
     }
-    .volume-container button:hover { transform: scale(1.1); color: #1db954; }
+    .volume-container button:hover {
+      transform: scale(1.1);
+      color: #1db954;
+    }
     .volume-container input[type="range"] {
-      width: 150px; -webkit-appearance: none; background: #404040;
-      height: 5px; border-radius: 5px; cursor: pointer;
+      width: 150px;
+      -webkit-appearance: none;
+      background: #404040;
+      height: 5px;
+      border-radius: 5px;
+      cursor: pointer;
     }
     .volume-container input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 15px; height: 15px; border-radius: 50%;
-      background: #1db954; cursor: pointer;
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #1db954;
+      cursor: pointer;
     }
     .volume-container input[type="range"]::-moz-range-thumb {
-      width: 15px; height: 15px; border-radius: 50%; background: #1db954; cursor: pointer;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #1db954;
+      cursor: pointer;
     }
     .fullscreen-btn {
-      position: absolute; top: 20px; right: 20px; background: none; border: none;
-      color: #fff; font-size: 24px; cursor: pointer;
-      transition: transform 0.2s ease, color 0.2s ease; z-index: 3;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      transition: transform 0.2s ease, color 0.2s ease;
+      z-index: 3;
     }
-    .fullscreen-btn:hover { transform: scale(1.2); color: #1db954; }
+    .fullscreen-btn:hover {
+      transform: scale(1.2);
+      color: #1db954;
+    }
     .db-meter-container {
-      width: 80%; max-width: 400px; height: 16px;
+      width: 80%;
+      max-width: 400px;
+      height: 16px;
       background: linear-gradient(to right,
-        rgba(0,255,0,0.1) 0%, rgba(0,255,0,0.1) 66.7%,
-        rgba(255,255,0,0.1) 66.7%, rgba(255,255,0,0.1) 83.3%,
-        rgba(255,0,0,0.1) 83.3%, rgba(255,0,0,0.1) 100%
+        rgba(0,255,0,0.1) 0%,
+        rgba(0,255,0,0.1) 66.7%,
+        rgba(255,255,0,0.1) 66.7%,
+        rgba(255,255,0,0.1) 83.3%,
+        rgba(255,0,0,0.1) 83.3%,
+        rgba(255,0,0,0.1) 100%
       );
-      border-radius: 4px; position: relative; margin: 0 auto 10px auto;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4); overflow: hidden;
+      border-radius: 4px;
+      position: relative;
+      margin: 0 auto 10px auto;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      overflow: hidden;
     }
     .db-meter-fill {
-      height: 100%; width: 0%; transition: width 0.1s linear, background 0.1s linear;
+      height: 100%;
+      width: 0%;
+      transition: width 0.1s linear, background 0.1s linear;
     }
     .db-meter-peak {
-      position: absolute; top: 0; height: 100%; width: 2px; opacity: 0.8;
-      transition: left 0.1s linear, background 0.1s linear; pointer-events: none;
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: 2px;
+      opacity: 0.8;
+      transition: left 0.1s linear, background 0.1s linear;
+      pointer-events: none;
     }
     .db-meter-label {
-      text-align: right; font-size: 12px; color: #fff;
-      width: 80%; max-width: 400px; margin: 0 auto 20px auto;
+      text-align: right;
+      font-size: 12px;
+      color: #fff;
+      width: 80%;
+      max-width: 400px;
+      margin: 0 auto 20px auto;
     }
     .db-meter-scale {
-      position: absolute; top: 100%; left: 0; width: 100%;
-      display: flex; justify-content: space-between; font-size: 10px; color: #ccc;
-      margin-top: 3px; pointer-events: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #ccc;
+      margin-top: 3px;
+      pointer-events: none;
     }
-    .db-meter-scale span { position: relative; transform: translateX(-50%); }
-    .db-meter-scale span:first-child { left: 0%; transform: translateX(0); }
+    .db-meter-scale span {
+      position: relative;
+      transform: translateX(-50%);
+    }
+    .db-meter-scale span:first-child {
+      left: 0%;
+      transform: translateX(0);
+    }
     .db-meter-scale span:nth-child(2) { left: 25%; }
     .db-meter-scale span:nth-child(3) { left: 50%; }
     .db-meter-scale span:nth-child(4) { left: 75%; }
-    .db-meter-scale span:last-child { left: 100%; transform: translateX(-100%); }
+    .db-meter-scale span:last-child {
+      left: 100%;
+      transform: translateX(-100%);
+    }
     .modal {
-      display: none; position: fixed; z-index: 4000; left: 0; top: 0;
-      width: 100%; height: 100%; background-color: rgba(0,0,0,0.7);
+      display: none;
+      position: fixed;
+      z-index: 4000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
     }
     .modal-content {
-      background: #242424; color: #fff; margin: 8% auto; padding: 20px;
-      border-radius: 8px; width: 90%; max-width: 500px;
+      background: #242424;
+      color: #fff;
+      margin: 8% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
       box-shadow: 0 8px 30px rgba(0,0,0,0.8);
-      max-height: 80vh; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;
+      max-height: 80vh;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
     .modal-content::-webkit-scrollbar { display: none; }
     .modal-content h3 { margin-top: 0; }
     .modal-content label {
-      display: block; margin: 10px 0 5px;
+      display: block;
+      margin: 10px 0 5px;
     }
     .modal-content input, .modal-content select {
-      width: 100%; padding: 8px; box-sizing: border-box;
-      border: 1px solid #444; border-radius: 4px; background: #1e1e1e; color: #fff;
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      border: 1px solid #444;
+      border-radius: 4px;
+      background: #1e1e1e;
+      color: #fff;
     }
     .modal-content input:focus, .modal-content select:focus {
-      border-color: #1db954; outline: none;
+      border-color: #1db954;
+      outline: none;
     }
     .modal-content button {
-      padding: 10px 15px; margin-top: 15px; cursor: pointer; border: none;
-      background: #1db954; color: #fff; border-radius: 4px; transition: background 0.3s ease;
+      padding: 10px 15px;
+      margin-top: 15px;
+      cursor: pointer;
+      border: none;
+      background: #1db954;
+      color: #fff;
+      border-radius: 4px;
+      transition: background 0.3s ease;
     }
     .modal-content button:hover { background: #17a44c; }
     .modal-content .cancelBtn { background: #999; margin-left: 10px; }
     .confirm-modal {
-      display: none; position: fixed; z-index: 5000; left: 0; top: 0;
-      width: 100%; height: 100%; background-color: rgba(0,0,0,0.8);
+      display: none;
+      position: fixed;
+      z-index: 5000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.8);
     }
     .confirm-modal-content {
-      background: #333; color: #fff; margin: 20% auto; padding: 20px;
-      border-radius: 8px; width: 90%; max-width: 400px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.8); text-align: center;
+      background: #333;
+      color: #fff;
+      margin: 20% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.8);
+      text-align: center;
     }
-    .confirm-modal-content p { margin: 0 0 20px; font-size: 18px; }
+    .confirm-modal-content p {
+      margin: 0 0 20px;
+      font-size: 18px;
+    }
     .confirm-modal-content button {
-      padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px;
-      cursor: pointer; font-size: 16px; transition: background 0.3s ease;
+      padding: 10px 20px;
+      margin: 0 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s ease;
     }
     .confirm-yes { background: #ff4d4d; color: #fff; }
     .confirm-yes:hover { background: #e60000; }
@@ -248,6 +561,11 @@
   </style>
 </head>
 <body>
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay">
+    <div class="spinner"></div>
+  </div>
+
   <!-- Blok Klik Kanan & DevTools Shortcut -->
   <script>
     document.addEventListener('contextmenu', event => event.preventDefault());
@@ -270,7 +588,7 @@
   <div class="container">
     <!-- SIDEBAR PLAYLIST -->
     <div class="sidebar" id="sidebar">
-      <h2>Playlist</h2>
+      <h2>Playlist <button id="mobileDeleteBtn">Hapus Data</button></h2>
       <button id="tambahMusikBtn">Tambah Musik</button>
       <div id="playlist"></div>
     </div>
@@ -283,7 +601,6 @@
       </div>
       <div class="player">
         <div class="cover-container" id="coverContainer">
-          <!-- Tidak ada default cover -->
           <img id="cover" src="" alt="Cover"/>
         </div>
         <div class="track-info">
@@ -307,7 +624,6 @@
           <button id="muteBtn"><i class="fas fa-volume-up"></i></button>
           <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1"/>
         </div>
-        <!-- dB Meter -->
         <div class="db-meter-container">
           <div class="db-meter-fill" id="dbMeterFill"></div>
           <div class="db-meter-peak" id="dbMeterPeak"></div>
@@ -320,7 +636,6 @@
           </div>
         </div>
         <div class="db-meter-label" id="dbMeterLabel">-∞ dB</div>
-        <!-- Audio kosong untuk user baru -->
         <audio id="audio" src=""></audio>
       </div>
     </div>
@@ -365,7 +680,7 @@
   </div>
 
   <script>
-    /* Variabel & Elemen DOM Utama */
+    /* Variabel & Elemen DOM */
     const audio = document.getElementById("audio"),
           bgVideo = document.getElementById("bgVideo"),
           playPauseBtn = document.getElementById("playPauseBtn"),
@@ -402,13 +717,24 @@
           bgTypeSelect = document.getElementById("bgTypeSelect"),
           confirmModal = document.getElementById("confirmModal"),
           confirmYes = document.getElementById("confirmYes"),
-          confirmNo = document.getElementById("confirmNo");
+          confirmNo = document.getElementById("confirmNo"),
+          loadingOverlay = document.getElementById("loadingOverlay"),
+          mobileDeleteBtn = document.getElementById("mobileDeleteBtn");
 
-    let isPlaying = false, isMuted = false, isShuffle = false, isRepeat = false,
-        currentTrackIndex = 0, audioCtx, analyserL, analyserR, dataArrayL, dataArrayR,
-        peakDb = -60, PEAK_DECAY = 0.3;
+    let isPlaying = false,
+        isMuted = false,
+        isShuffle = false,
+        isRepeat = false,
+        currentTrackIndex = 0,
+        audioCtx,
+        analyserL,
+        analyserR,
+        dataArrayL,
+        dataArrayR,
+        peakDb = -60,
+        PEAK_DECAY = 0.3;
 
-    // Array tracks kosong (user baru tidak ada default)
+    // Untuk user baru, playlist kosong
     let tracks = [];
 
     /* Load & Save localStorage */
@@ -438,7 +764,7 @@
       }
     }
 
-    /* Setup AudioContext & Analyser */
+    /* Setup Analyser (AudioContext) */
     function setupAnalyser() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -504,13 +830,13 @@
       trackArtistEl.textContent = track.artist;
       coverEl.src = track.cover;
       updateMediaSessionMetadata(track);
-      if (track.bgType === "video" && track.video) {
+      if (track.bgType === "video" && track.video !== "") {
         bgVideo.style.display = "block";
         bgVideo.src = track.video;
         bgVideo.load();
         if (isPlaying) bgVideo.play();
         document.querySelector(".main-content").style.backgroundImage = "";
-      } else if (track.bgType === "image" && track.video) {
+      } else if (track.bgType === "image" && track.video !== "") {
         bgVideo.pause();
         bgVideo.style.display = "none";
         document.querySelector(".main-content").style.backgroundImage = `url(${track.video})`;
@@ -601,8 +927,12 @@
             isPlaying = true;
             playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
             coverContainer.classList.add("playing");
-            if (!audioCtx) { setupAnalyser(); requestAnimationFrame(updateDbMeter); }
-            else if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+            if (!audioCtx) {
+              setupAnalyser();
+              requestAnimationFrame(updateDbMeter);
+            } else if (audioCtx.state === 'suspended') {
+              audioCtx.resume();
+            }
             updateActivePlaylist();
           });
           li.addEventListener("dragstart", (e) => {
@@ -660,8 +990,12 @@
         isPlaying = true;
         playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
         coverContainer.classList.add("playing");
-        if (!audioCtx) { setupAnalyser(); requestAnimationFrame(updateDbMeter); }
-        else if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+        if (!audioCtx) {
+          setupAnalyser();
+          requestAnimationFrame(updateDbMeter);
+        } else if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
         if (bgVideo.style.display !== "none") { bgVideo.play(); }
       } else {
         audio.pause();
@@ -744,7 +1078,6 @@
         fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
       }
     });
-
     /* Modal Konfirmasi Hapus Local Storage */
     confirmYes.addEventListener("click", () => {
       localStorage.removeItem("tracks");
@@ -759,7 +1092,6 @@
     confirmNo.addEventListener("click", () => {
       confirmModal.style.display = "none";
     });
-
     /* Save & Load State */
     function saveState() {
       localStorage.setItem("currentTrackIndex", currentTrackIndex);
@@ -772,7 +1104,6 @@
       if (savedIndex !== null) currentTrackIndex = parseInt(savedIndex, 10);
       if (savedTime !== null) audio.currentTime = parseFloat(savedTime);
     }
-
     function init() {
       loadTracksFromStorage();
       populatePlaylist();
@@ -786,7 +1117,6 @@
     nextBtn.addEventListener("click", playNext);
     muteBtn.addEventListener("click", toggleMute);
     window.addEventListener("load", init);
-
     /* Toggle Sidebar */
     toggleSidebarBtn.addEventListener("click", () => {
       sidebar.classList.toggle("collapsed");
@@ -798,7 +1128,10 @@
         toggleSidebarBtn.style.left = "280px";
       }
     });
-
+    /* Tombol Hapus Data Mobile */
+    mobileDeleteBtn.addEventListener("click", () => {
+      confirmModal.style.display = "block";
+    });
     /* Modal Tambah Musik */
     tambahMusikBtn.addEventListener("click", () => {
       musicModal.style.display = "block";
@@ -809,6 +1142,8 @@
     });
     musicForm.addEventListener("submit", (e) => {
       e.preventDefault();
+      // Tampilkan loading overlay
+      loadingOverlay.style.display = "flex";
       const title = trackTitleInput.value.trim(),
             artist = trackArtistInput.value.trim(),
             genre = trackGenreInput.value.trim();
@@ -831,7 +1166,7 @@
           genre: genre || "User Added",
           src: musicSrc,
           cover: coverSrc,
-          video: bgSrc,
+          video: bgSrc, // data URL untuk background
           bgType: bgTypeSelect.value
         };
         tracks.push(newTrack);
@@ -841,6 +1176,9 @@
         musicForm.reset();
       }).catch(err => {
         console.error("Error membaca file:", err);
+      }).finally(() => {
+        // Sembunyikan loading overlay setelah proses selesai
+        loadingOverlay.style.display = "none";
       });
     });
   </script>
