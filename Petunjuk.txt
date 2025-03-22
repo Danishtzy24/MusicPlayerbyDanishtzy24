@@ -1,0 +1,22 @@
+== Petunjuk Sederhana ==
+-- yang dibutuhkan --
+- Butuh Visual Studio Code (yang bitu)
+- plugin live server di market place visual studio code
+
+== Cara Menggunakan ==
+- Download Index.html ini atau salin semua kode yang ada di html ini
+- buka visual studio code (yang biru)
+- paste kode html yang kamu udah salin dari github ini
+- jalan kan menggunakan live server yang ada di visual studio code
+
+== Cara Menambahkan Music Beserta Cover / Sampul Music Nya ==
+- buka Spotify
+- pilih music kamu mau
+- salin tautan music nya
+- buka website ini : https://spotidownloader.com/id
+- paste tautan music yang udah kamu salin
+- download mp3 dan cover/sampul music nya
+- buka website yang kamu udah jalankan dari live server
+- pencet tambahkan musik
+- masukan music dan cover/sampul yang udah kamu download
+- selesai :)
