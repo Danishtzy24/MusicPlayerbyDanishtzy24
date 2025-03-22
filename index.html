@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Music Player Online By Danishtzy24</title>
+  <title>Music Player with Media Session, Sync Video/Image & Loading Indicator</title>
   <!-- Google Fonts: Poppins -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <!-- Font Awesome -->
@@ -11,14 +11,10 @@
   <style>
     /* RESET & DASAR */
     html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
+      margin: 0; padding: 0; width: 100%; height: 100%;
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #1e1e1e, #121212);
-      overflow: hidden;
-      color: #fff;
+      overflow: hidden; color: #fff;
     }
     /* Loading Overlay */
     #loadingOverlay {
@@ -47,10 +43,7 @@
     }
     /* CONTAINER UTAMA */
     .container {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      position: relative;
+      width: 100%; height: 100%; display: flex; position: relative;
     }
     /* SIDEBAR PLAYLIST */
     .sidebar {
@@ -69,16 +62,14 @@
       border: none;
       overflow: hidden;
     }
-    .sidebar::-webkit-scrollbar {
-      display: none;
-    }
+    .sidebar::-webkit-scrollbar { display: none; }
     .sidebar h2 {
       font-size: 20px;
       margin-bottom: 15px;
       color: #fff;
       display: inline-block;
     }
-    /* Tombol Hapus Data Mobile (hanya muncul di mobile) */
+    /* Tombol Hapus Data Mobile (hanya di mobile) */
     #mobileDeleteBtn {
       display: none;
       background: #ff4d4d;
@@ -92,9 +83,7 @@
       vertical-align: middle;
     }
     @media (max-width: 768px) {
-      #mobileDeleteBtn {
-        display: inline-block;
-      }
+      #mobileDeleteBtn { display: inline-block; }
     }
     #tambahMusikBtn {
       display: block;
@@ -109,12 +98,8 @@
       border-radius: 4px;
       transition: background 0.3s ease;
     }
-    #tambahMusikBtn:hover {
-      background: #17a44c;
-    }
-    .genre-section {
-      margin-bottom: 15px;
-    }
+    #tambahMusikBtn:hover { background: #17a44c; }
+    .genre-section { margin-bottom: 15px; }
     .genre-header {
       display: flex;
       justify-content: space-between;
@@ -127,10 +112,7 @@
       color: #fff;
       font-weight: 600;
     }
-    .genre-header i {
-      transition: transform 0.3s;
-      color: #fff;
-    }
+    .genre-header i { transition: transform 0.3s; color: #fff; }
     .genre-section ul {
       list-style: none;
       margin: 0;
@@ -151,16 +133,9 @@
       transition: background 0.3s;
       position: relative;
     }
-    .playlist-item:hover {
-      background: #a9a9a9;
-    }
-    .playlist-item.active {
-      background: #1db954;
-      outline: none;
-    }
-    .playlist-item.dragging {
-      outline: none !important;
-    }
+    .playlist-item:hover { background: #a9a9a9; }
+    .playlist-item.active { background: #1db954; outline: none; }
+    .playlist-item.dragging { outline: none !important; }
     .playlist-item img.track-preview {
       width: 50px;
       height: 50px;
@@ -174,12 +149,7 @@
       color: #fff;
       flex: 1;
     }
-    .drag-handle {
-      color: #fff;
-      font-size: 18px;
-      cursor: move;
-      margin-right: 5px;
-    }
+    .drag-handle { color: #fff; font-size: 18px; cursor: move; margin-right: 5px; }
     #toggleSidebar {
       position: absolute;
       top: 50%;
@@ -199,18 +169,14 @@
       justify-content: center;
       transition: left 0.3s ease, background 0.3s ease;
     }
-    #toggleSidebar:hover {
-      background: #17a44c;
-    }
+    #toggleSidebar:hover { background: #17a44c; }
     .main-content {
       flex: 1;
       padding: 20px;
       overflow-y: auto;
       position: relative;
     }
-    .main-content::-webkit-scrollbar {
-      display: none;
-    }
+    .main-content::-webkit-scrollbar { display: none; }
     #bgVideo {
       position: absolute;
       top: 0;
@@ -231,13 +197,8 @@
       opacity: 1;
       transition: opacity 0.5s ease;
     }
-    .main-content:hover .overlay {
-      opacity: 0;
-    }
-    .navbar, .player {
-      position: relative;
-      z-index: 2;
-    }
+    .main-content:hover .overlay { opacity: 0; }
+    .navbar, .player { position: relative; z-index: 2; }
     .navbar {
       display: flex;
       justify-content: space-between;
@@ -271,10 +232,7 @@
       object-fit: cover;
       transition: transform 0.1s ease-out;
     }
-    .track-info {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+    .track-info { text-align: center; margin-bottom: 20px; }
     .track-info h2 {
       font-size: 28px;
       color: #1db954;
@@ -300,13 +258,8 @@
       cursor: pointer;
       transition: transform 0.2s ease, color 0.2s ease;
     }
-    .controls button:hover {
-      transform: scale(1.2);
-      color: #1db954;
-    }
-    .controls button.repeat-active {
-      color: #1db954;
-    }
+    .controls button:hover { transform: scale(1.2); color: #1db954; }
+    .controls button.repeat-active { color: #1db954; }
     .progress-container {
       width: 80%;
       background: #404040;
@@ -346,10 +299,7 @@
       cursor: pointer;
       transition: transform 0.2s ease, color 0.2s ease;
     }
-    .volume-container button:hover {
-      transform: scale(1.1);
-      color: #1db954;
-    }
+    .volume-container button:hover { transform: scale(1.1); color: #1db954; }
     .volume-container input[type="range"] {
       width: 150px;
       -webkit-appearance: none;
@@ -385,10 +335,7 @@
       transition: transform 0.2s ease, color 0.2s ease;
       z-index: 3;
     }
-    .fullscreen-btn:hover {
-      transform: scale(1.2);
-      color: #1db954;
-    }
+    .fullscreen-btn:hover { transform: scale(1.2); color: #1db954; }
     .db-meter-container {
       width: 80%;
       max-width: 400px;
@@ -532,10 +479,7 @@
       box-shadow: 0 8px 30px rgba(0,0,0,0.8);
       text-align: center;
     }
-    .confirm-modal-content p {
-      margin: 0 0 20px;
-      font-size: 18px;
-    }
+    .confirm-modal-content p { margin: 0 0 20px; font-size: 18px; }
     .confirm-modal-content button {
       padding: 10px 20px;
       margin: 0 10px;
@@ -740,9 +684,7 @@
     /* Load & Save localStorage */
     function loadTracksFromStorage() {
       const savedTracks = localStorage.getItem("tracks");
-      if (savedTracks) {
-        tracks = JSON.parse(savedTracks);
-      }
+      if (savedTracks) { tracks = JSON.parse(savedTracks); }
     }
     function saveTracksToStorage() {
       localStorage.setItem("tracks", JSON.stringify(tracks));
@@ -830,6 +772,7 @@
       trackArtistEl.textContent = track.artist;
       coverEl.src = track.cover;
       updateMediaSessionMetadata(track);
+      // Penanganan Background
       if (track.bgType === "video" && track.video !== "") {
         bgVideo.style.display = "block";
         bgVideo.src = track.video;
@@ -1142,7 +1085,7 @@
     });
     musicForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      // Tampilkan loading overlay
+      // Tampilkan loading indicator
       loadingOverlay.style.display = "flex";
       const title = trackTitleInput.value.trim(),
             artist = trackArtistInput.value.trim(),
@@ -1166,7 +1109,7 @@
           genre: genre || "User Added",
           src: musicSrc,
           cover: coverSrc,
-          video: bgSrc, // data URL untuk background
+          video: bgSrc, // Data URL untuk file background (video atau image)
           bgType: bgTypeSelect.value
         };
         tracks.push(newTrack);
@@ -1177,7 +1120,7 @@
       }).catch(err => {
         console.error("Error membaca file:", err);
       }).finally(() => {
-        // Sembunyikan loading overlay setelah proses selesai
+        // Sembunyikan loading indicator
         loadingOverlay.style.display = "none";
       });
     });
