@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Music Player with Media Session & Sync Video</title>
+  <title>Music Player Online by Danishtzy24</title>
   <!-- Google Fonts: Poppins -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <!-- Font Awesome -->
@@ -25,7 +25,9 @@
     }
     .sidebar.collapsed { width: 0; padding: 0; border: none; overflow: hidden; }
     .sidebar::-webkit-scrollbar { display: none; }
-    .sidebar h2 { font-size: 20px; margin-bottom: 15px; color: #fff; }
+    .sidebar h2 {
+      font-size: 20px; margin-bottom: 15px; color: #fff;
+    }
     #tambahMusikBtn {
       display: block; width: 100%; padding: 10px; margin-bottom: 15px;
       background: #1db954; color: #fff; border: none; font-size: 16px; cursor: pointer;
@@ -55,7 +57,9 @@
     .playlist-item img.track-preview {
       width: 50px; height: 50px; object-fit: cover; border-radius: 4px; flex-shrink: 0;
     }
-    .playlist-item .track-text { font-size: 14px; font-weight: 500; color: #fff; flex: 1; }
+    .playlist-item .track-text {
+      font-size: 14px; font-weight: 500; color: #fff; flex: 1;
+    }
     .drag-handle {
       color: #fff; font-size: 18px; cursor: move; margin-right: 5px;
     }
@@ -87,7 +91,8 @@
       margin-bottom: 20px;
     }
     .navbar .title {
-      font-size: 24px; color: #1db954; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      font-size: 24px; color: #1db954;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
     }
     .player {
       display: flex; flex-direction: column; align-items: center;
@@ -100,7 +105,9 @@
     .cover-container img {
       width: 100%; height: 100%; object-fit: cover; transition: transform 0.1s ease-out;
     }
-    .track-info { text-align: center; margin-bottom: 20px; }
+    .track-info {
+      text-align: center; margin-bottom: 20px;
+    }
     .track-info h2 {
       font-size: 28px; color: #1db954; margin-bottom: 10px;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
@@ -415,7 +422,7 @@
         currentTrackIndex = 0, audioCtx, analyserL, analyserR, dataArrayL, dataArrayR,
         peakDb = -60, PEAK_DECAY = 0.3;
 
-    // Array track kosong => user baru tidak ada default file
+    // Array track kosong => user baru tidak ada default
     let tracks = [];
 
     /* Load & Save localStorage */
@@ -431,7 +438,7 @@
       localStorage.setItem("currentTime", audio.currentTime);
     }
 
-    /* Media Session API - agar notifikasi background menampilkan cover dsb. */
+    /* Media Session API - notifikasi background */
     function updateMediaSessionMetadata(track) {
       if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
@@ -445,7 +452,7 @@
       }
     }
 
-    /* Setup AudioContext & Analyser */
+    /* Setup Analyser (AudioContext) */
     function setupAnalyser() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -498,7 +505,6 @@
     /* Load Track ke Player */
     function loadTrack(index) {
       if (tracks.length === 0) {
-        // Playlist kosong => reset tampilan
         audio.src = "";
         trackTitleEl.textContent = "";
         trackArtistEl.textContent = "";
@@ -516,7 +522,7 @@
         bgVideo.style.display = "block";
         bgVideo.src = track.video;
         bgVideo.load();
-        // Jika sedang play => video ikut play
+        // Sinkron play/pause
         if (isPlaying) bgVideo.play();
         document.querySelector(".main-content").style.backgroundImage = "";
       } else if (track.video) {
@@ -557,7 +563,7 @@
       };
     }
 
-    /* Update item playlist yang aktif */
+    /* Update item playlist aktif */
     function updateActivePlaylist() {
       const allItems = playlistEl.querySelectorAll("li");
       allItems.forEach(item => {
@@ -591,7 +597,6 @@
         ul.style.maxHeight = "0px";
         ul.style.overflow = "hidden";
         ul.style.transition = "max-height 0.3s ease";
-
         genreGroups[genre].forEach(({ track, index }, pos) => {
           const li = document.createElement("li");
           li.setAttribute("data-index", index);
@@ -603,7 +608,6 @@
             <img src="${track.cover || ""}" alt="${track.title}" class="track-preview">
             <span class="track-text">${track.title} - ${track.artist}</span>
           `;
-          // Klik => load track
           li.addEventListener("click", (e) => {
             if (e.target.classList.contains("drag-handle")) return;
             currentTrackIndex = index;
@@ -616,7 +620,6 @@
             else if (audioCtx.state === 'suspended') { audioCtx.resume(); }
             updateActivePlaylist();
           });
-          // Drag & drop
           li.addEventListener("dragstart", (e) => {
             li.classList.add("dragging");
             e.dataTransfer.setData("text/plain", JSON.stringify({
@@ -640,7 +643,6 @@
               const temp = arr[oldPos];
               arr[oldPos] = arr[newPos];
               arr[newPos] = temp;
-              // Tukar di 'tracks'
               const tempTrack = tracks[fromIndex];
               tracks[fromIndex] = tracks[toIndex];
               tracks[toIndex] = tempTrack;
@@ -677,7 +679,7 @@
         coverContainer.classList.add("playing");
         if (!audioCtx) { setupAnalyser(); requestAnimationFrame(updateDbMeter); }
         else if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-        // Jika background video sedang "block", play
+        // Jika background video ditampilkan, ikut play
         if (bgVideo.style.display !== "none") {
           bgVideo.play();
         }
@@ -731,7 +733,9 @@
       }
     });
     audio.addEventListener("loadedmetadata", () => {
-      if (audio.duration) totalTimeEl.textContent = formatTime(audio.duration);
+      if (audio.duration) {
+        totalTimeEl.textContent = formatTime(audio.duration);
+      }
     });
     audio.addEventListener("ended", () => {
       if (isRepeat) {
@@ -799,10 +803,12 @@
       if (savedIndex !== null) currentTrackIndex = parseInt(savedIndex, 10);
       if (savedTime !== null) audio.currentTime = parseFloat(savedTime);
     }
+
     function init() {
       loadTracksFromStorage();
       populatePlaylist();
       loadState();
+      // Jika ada track, load track
       if (tracks.length > 0) {
         loadTrack(currentTrackIndex);
       }
@@ -813,6 +819,7 @@
     prevBtn.addEventListener("click", playPrev);
     nextBtn.addEventListener("click", playNext);
     muteBtn.addEventListener("click", toggleMute);
+
     window.addEventListener("load", init);
 
     /* Toggle Sidebar */
