@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Music Player with Media Session, Sync Video/Image & Loading Indicator</title>
+  <title>Music Player Online By Danishtzy24</title>
   <!-- Google Fonts: Poppins -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- localForage -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
   <style>
     /* RESET & DASAR */
     html, body {
@@ -19,10 +21,8 @@
     /* Loading Overlay */
     #loadingOverlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.6);
       display: none;
       z-index: 7000;
@@ -57,10 +57,7 @@
       position: relative;
     }
     .sidebar.collapsed {
-      width: 0;
-      padding: 0;
-      border: none;
-      overflow: hidden;
+      width: 0; padding: 0; border: none; overflow: hidden;
     }
     .sidebar::-webkit-scrollbar { display: none; }
     .sidebar h2 {
@@ -82,9 +79,7 @@
       margin-left: 10px;
       vertical-align: middle;
     }
-    @media (max-width: 768px) {
-      #mobileDeleteBtn { display: inline-block; }
-    }
+    @media (max-width: 768px) { #mobileDeleteBtn { display: inline-block; } }
     #tambahMusikBtn {
       display: block;
       width: 100%;
@@ -510,7 +505,8 @@
     <div class="spinner"></div>
   </div>
 
-  <!-- Blok Klik Kanan & DevTools Shortcut -->
+  <!-- Hapus fitur Anti Dev Tools (dikomentari untuk pengujian) -->
+  <!--
   <script>
     document.addEventListener('contextmenu', event => event.preventDefault());
     document.addEventListener('keydown', function(e) {
@@ -521,11 +517,10 @@
       }
     });
   </script>
+  -->
 
   <!-- Tombol Fullscreen -->
-  <button class="fullscreen-btn" id="fullscreenBtn">
-    <i class="fas fa-expand"></i>
-  </button>
+  <button class="fullscreen-btn" id="fullscreenBtn"><i class="fas fa-expand"></i></button>
   <!-- Tombol Toggle Sidebar -->
   <button id="toggleSidebar"><i class="fas fa-angle-double-left"></i></button>
 
@@ -678,18 +673,23 @@
         peakDb = -60,
         PEAK_DECAY = 0.3;
 
-    // Untuk user baru, playlist kosong
+    // Playlist kosong untuk user baru
     let tracks = [];
 
-    /* Load & Save localStorage */
-    function loadTracksFromStorage() {
-      const savedTracks = localStorage.getItem("tracks");
-      if (savedTracks) { tracks = JSON.parse(savedTracks); }
-    }
+    /* Save & Load menggunakan localForage */
     function saveTracksToStorage() {
-      localStorage.setItem("tracks", JSON.stringify(tracks));
-      localStorage.setItem("currentTrackIndex", currentTrackIndex);
-      localStorage.setItem("currentTime", audio.currentTime);
+      localforage.setItem("tracks", tracks)
+        .then(() => localforage.setItem("currentTrackIndex", currentTrackIndex))
+        .then(() => localforage.setItem("currentTime", audio.currentTime))
+        .catch(err => console.error("Error saving data:", err));
+    }
+
+    function loadTracksFromStorage() {
+      return localforage.getItem("tracks")
+        .then(savedTracks => {
+          if (savedTracks) { tracks = savedTracks; }
+        })
+        .catch(err => console.error("Error loading tracks:", err));
     }
 
     /* Media Session API */
@@ -772,7 +772,7 @@
       trackArtistEl.textContent = track.artist;
       coverEl.src = track.cover;
       updateMediaSessionMetadata(track);
-      // Penanganan Background
+      // Penanganan Background:
       if (track.bgType === "video" && track.video !== "") {
         bgVideo.style.display = "block";
         bgVideo.src = track.video;
@@ -1023,18 +1023,17 @@
     });
     /* Modal Konfirmasi Hapus Local Storage */
     confirmYes.addEventListener("click", () => {
-      localStorage.removeItem("tracks");
-      localStorage.removeItem("currentTrackIndex");
-      localStorage.removeItem("currentTime");
-      tracks = [];
-      populatePlaylist();
-      alert("Local storage telah dihapus.");
-      confirmModal.style.display = "none";
-      location.reload();
+      localforage.removeItem("tracks").then(() => {
+        localStorage.removeItem("currentTrackIndex");
+        localStorage.removeItem("currentTime");
+        tracks = [];
+        populatePlaylist();
+        alert("Local storage telah dihapus.");
+        confirmModal.style.display = "none";
+        location.reload();
+      });
     });
-    confirmNo.addEventListener("click", () => {
-      confirmModal.style.display = "none";
-    });
+    confirmNo.addEventListener("click", () => { confirmModal.style.display = "none"; });
     /* Save & Load State */
     function saveState() {
       localStorage.setItem("currentTrackIndex", currentTrackIndex);
@@ -1048,12 +1047,13 @@
       if (savedTime !== null) audio.currentTime = parseFloat(savedTime);
     }
     function init() {
-      loadTracksFromStorage();
-      populatePlaylist();
-      loadState();
-      if (tracks.length > 0) { loadTrack(currentTrackIndex); }
-      setupAnalyser();
-      updateDbMeter();
+      loadTracksFromStorage().then(() => {
+        populatePlaylist();
+        loadState();
+        if (tracks.length > 0) { loadTrack(currentTrackIndex); }
+        setupAnalyser();
+        updateDbMeter();
+      });
     }
     playPauseBtn.addEventListener("click", togglePlayPause);
     prevBtn.addEventListener("click", playPrev);
@@ -1117,10 +1117,18 @@
         populatePlaylist();
         musicModal.style.display = "none";
         musicForm.reset();
+        if (newTrack.bgType === "video" && newTrack.video !== "") {
+          bgVideo.onloadeddata = () => {
+            loadingOverlay.style.display = "none";
+            bgVideo.onloadeddata = null;
+          };
+          bgVideo.src = newTrack.video;
+          bgVideo.load();
+        } else {
+          loadingOverlay.style.display = "none";
+        }
       }).catch(err => {
         console.error("Error membaca file:", err);
-      }).finally(() => {
-        // Sembunyikan loading indicator
         loadingOverlay.style.display = "none";
       });
     });
